@@ -81,6 +81,12 @@
   opacity: .4;
   stroke-linecap: round;
 }
+#ringw.responding { animation: runeGlow 1.35s ease-out; }
+@keyframes runeGlow {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  24% { filter: drop-shadow(0 0 7px var(--rune-glow)) drop-shadow(0 0 22px var(--rune-glow)); }
+  55% { filter: drop-shadow(0 0 12px var(--rune-glow)) drop-shadow(0 0 34px var(--rune-glow)); }
+}
 @media (max-width: 520px) { #ringw { width: 150%; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #ringw svg { animation: none; } }

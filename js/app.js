@@ -1,6 +1,8 @@
 
 const $=s=>document.querySelector(s),TAU=Math.PI*2,rand=(a,b)=>a+Math.random()*(b-a);
-const cv=$('#fx'),g=cv.getContext('2d'),mage=$('#mage'),orb=$('#orb'),stage=$('#stage');
+const cv=$('#fx'),g=cv.getContext('2d'),mage=$('#mage'),orb=$('#orb'),stage=$('#stage'),runeRing=$('#ringw');
+let runeGlowTimer;
+function glowRunes(color){runeRing.style.setProperty('--rune-glow',color);runeRing.classList.remove('responding');void runeRing.offsetWidth;runeRing.classList.add('responding');clearTimeout(runeGlowTimer);runeGlowTimer=setTimeout(()=>runeRing.classList.remove('responding'),1400)}
 let W,H,D,mx=innerWidth/2,my=innerHeight/2;
 function size(){const v=window.visualViewport;D=Math.min(devicePixelRatio||1,2);W=Math.max(1,v? v.width:innerWidth);H=Math.max(1,v? v.height:innerHeight);cv.width=Math.round(W*D);cv.height=Math.round(H*D);g.setTransform(D,0,0,D,0,0)}
 addEventListener('resize',size);addEventListener('orientationchange',size);if(window.visualViewport&&window.visualViewport.addEventListener)window.visualViewport.addEventListener('resize',size);size();
@@ -57,7 +59,7 @@ let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;g.clearRect(0,0,W,H);g.lineCap=g.lineJoin='round';g.setLineDash([]);
  if(drawing.draft){g.globalAlpha=1;g.strokeStyle='#17120f';g.lineWidth=3;drawing.draft.forEach(s=>path(s,s.length))}
  for(let k=sigils.length-1;k>=0;k--){const s=sigils[k];
-  if(!s.a&&now>=s.arm){s.a=1;mageController.cast(s,W)}
+  if(!s.a&&now>=s.arm){s.a=1;mageController.cast(s,W);glowRunes(s.lanternColor||K[s.k][1])}
   if(!s.i&&now>=s.ign){s.i=1;sound.boltLand();sound.spell(s.k);if(s.custom){const hint=$('#hint');hint.textContent=`${s.custom.name}: ${s.custom.action}`;hint.classList.remove('off');clearTimeout(hintTimer);hintTimer=setTimeout(()=>hint.classList.add('off'),3200)}}
   if(now>s.end){sigils.splice(k,1);continue}
   const f=s.tr?Math.min(1,(now-s.t0)/s.tr):1,q=(now-s.ign)/1000,al=s.i?(q<.8?1:Math.max(0,1-(q-.8)/1.2)):.9,n=p=>Math.ceil(p.length*f);
