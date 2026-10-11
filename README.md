@@ -44,7 +44,7 @@ Visit [http://localhost:8000](http://localhost:8000). You can also open `index.h
 | **Void** | A descending drone drawn inward to a hollow collapse |
 | **Random sigil** | A freshly shaped design paired with a randomly chosen school of magic |
 
-Hand-drawn marks choose their magic at cast time. The random selection can also call on frost, bloom, or ink-lightning effects.
+Hand-drawn marks summon a freshly generated spell each time, such as a fire spirit, forked lightning, growing crystal, thorned vines, a turning rift, falling stars, a curling tide, or a star familiar. Spell types cycle in a shuffled order, so a type cannot repeat until the others have appeared. Each cast gets new colors, motion, and details shaped by the drawing, along with a generated name. Named sigils keep their illustrated effects. The Random sigil can also call on frost, bloom, or ink-lightning effects.
 
 ## Sound, made for the moment
 

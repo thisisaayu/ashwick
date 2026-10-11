@@ -1,4 +1,92 @@
-window.ASHWICK_SPELL_EFFECTS = ({g,TAU,rand,wc,tr,inked,stage,emit,parts,getPointer}) => { let {mx,my}=getPointer(); return {
+window.ASHWICK_SPELL_EFFECTS = ({g,TAU,rand,wc,tr,inked,stage,emit,parts,getPointer}) => { let {mx,my}=getPointer();
+const customKinds=[
+ {name:'firebolt',action:'A fire spirit bursts from the drawn mark',hue:12},
+ {name:'lightning',action:'Forked lightning leaps from the sigil',hue:258},
+ {name:'frost',action:'A crystal bloom grows through the air',hue:193},
+ {name:'vine',action:'Thorned vines unfurl and reach outward',hue:104},
+ {name:'rift',action:'A doorway opens into a turning void',hue:281},
+ {name:'meteor',action:'A shower of falling stars strikes the mark',hue:25},
+ {name:'tide',action:'A curling wave sweeps through the sigil',hue:187},
+ {name:'familiar',action:'A little star familiar awakens and circles',hue:252}
+];
+const nameWords=['Wandering','Elder','Singing','Wild','Hollow','Dawnlit','Wayward','Whispering','Bright','Thornbound','Farseeing','Stormworn'];
+let kindBag=[],lastKind;
+const nextCustomKind=()=>{
+ if(!kindBag.length){
+  kindBag=customKinds.slice();
+  for(let i=kindBag.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[kindBag[i],kindBag[j]]=[kindBag[j],kindBag[i]]}
+  if(kindBag[kindBag.length-1].name===lastKind)[kindBag[0],kindBag[kindBag.length-1]]=[kindBag[kindBag.length-1],kindBag[0]];
+ }
+ lastKind=kindBag[kindBag.length-1].name;
+ return kindBag.pop();
+};
+const createCustom=strokes=>{
+ const points=strokes.flat();
+ const bounds=points.reduce((b,[x,y])=>({minX:Math.min(b.minX,x),maxX:Math.max(b.maxX,x),minY:Math.min(b.minY,y),maxY:Math.max(b.maxY,y),sumX:b.sumX+x,sumY:b.sumY+y}),{minX:Infinity,maxX:-Infinity,minY:Infinity,maxY:-Infinity,sumX:0,sumY:0});
+ const cx=bounds.sumX/points.length,cy=bounds.sumY/points.length,aspect=(bounds.maxY-bounds.minY)/(bounds.maxX-bounds.minX||1),start=points[0];
+ const kind=nextCustomKind(),hue=(kind.hue+rand(-32,32)+360)%360;
+ return{kind:kind.name,action:kind.action,name:`${nameWords[Math.random()*nameWords.length|0]} ${kind.name[0].toUpperCase()+kind.name.slice(1)}`,ink:`hsl(${hue} 48% 23%)`,light:`hsl(${hue+18} 72% 57%)`,spark:`hsl(${hue+38} 96% 82%)`,branches:4+((strokes.length+Math.random()*7|0)%7),petals:4+((Math.floor(points.length/10)+Math.random()*7|0)%7),turns:2+(Math.random()*5|0),phase:Math.atan2(start[1]-cy,start[0]-cx)+rand(-1,1),twist:rand(-2.8,2.8),spin:rand(-1.8,1.8),flatten:Math.max(.55,Math.min(1.3,aspect*.55+rand(.25,.75))),seed:rand(0,TAU),reach:rand(1.1,2.2),variant:Math.random()};
+};
+return {createCustom,custom(s,q){
+ const c=s.custom;if(!c)return;const grow=1-Math.pow(1-Math.min(1,q/.62),3),fade=q>2.25?Math.max(0,1-(q-2.25)/.78):1;if(fade<=0||grow<=0)return;
+ const{cx,cy,r}=s,R=r*(.65+.8*grow),phase=c.phase+q*c.spin;
+ const point=(a,d,flat=c.flatten)=>[cx+Math.cos(a)*d,cy+Math.sin(a)*d*flat];
+ const line=(ps,color,width)=>{g.beginPath();tr(ps);g.strokeStyle=color;g.lineWidth=width;g.stroke()};
+ const flame=(x,y,size,a)=>{g.save();g.translate(x,y);g.rotate(a);g.beginPath();g.moveTo(0,size);g.bezierCurveTo(-size*.8,size*.4,-size*.55,-size*.2,0,-size);g.bezierCurveTo(size*.55,-size*.25,size*.85,size*.35,0,size);g.closePath();g.fillStyle=c.ink;g.fill();g.beginPath();g.moveTo(0,size*.55);g.quadraticCurveTo(-size*.35,0,0,-size*.55);g.quadraticCurveTo(size*.4,0,0,size*.55);g.fillStyle=c.spark;g.fill();g.restore()};
+ g.save();g.globalAlpha=fade;g.lineCap='round';g.lineJoin='round';
+ if(c.kind==='firebolt'){
+  const flare=R*(.36+.07*Math.sin(q*11+c.seed));g.globalAlpha=fade*(.72+.22*Math.sin(q*8));g.beginPath();g.arc(cx,cy,flare,0,TAU);g.fillStyle=c.ink;g.fill();g.beginPath();g.arc(cx,cy,flare*.58,0,TAU);g.fillStyle=c.light;g.fill();
+  for(let i=0;i<c.petals;i++){const a=i/c.petals*TAU+phase,d=R*(.35+.32*Math.sin(q*4+i+c.seed));flame(cx+Math.cos(a)*d,cy+Math.sin(a)*d,d*.68,a-Math.PI/2)}
+  for(let i=0;i<4;i++){const a=i*TAU/4+phase,ps=Array.from({length:18},(_,j)=>point(a+(j/17-.5)*.55,R*(.35+j/17*1.05)*(1+.08*Math.sin(j*2+c.seed))));line(ps,i%2?c.spark:c.light,2.5)}
+ }else if(c.kind==='lightning'){
+  const flash=.65+.35*Math.sin(q*24+c.seed);g.globalAlpha=fade*flash;
+  for(let b=0;b<c.branches;b++){const a=b/c.branches*TAU+phase,len=R*(.72+.72*((b*7%11)/11)),steps=9,ps=[];
+   for(let j=0;j<=steps;j++){const d=len*j/steps,side=j===0||j===steps?0:Math.sin(j*91+c.seed+b*7)*R*.085;ps.push([cx+Math.cos(a)*d-Math.sin(a)*side,cy+(Math.sin(a)*d+Math.cos(a)*side)*c.flatten])}
+   line(ps,c.ink,5);line(ps,c.spark,2);
+   if(b%2===0&&b<c.branches-1){const from=ps[4],ba=a+Math.sin(c.seed+b*7)*.48,branch=[];for(let j=0;j<5;j++){const d=j*len*.09;branch.push([from[0]+Math.cos(ba)*d+Math.sin(ba)*Math.sin(j*8+c.seed)*8,from[1]+Math.sin(ba)*d*c.flatten])}line(branch,c.light,1.7)}
+  }
+  g.beginPath();g.arc(cx,cy,R*.2,0,TAU);g.fillStyle=c.spark;g.fill();
+ }else if(c.kind==='frost'){
+  const reach=R*grow*c.reach;
+  for(let b=0;b<c.branches;b++){const a=b/c.branches*TAU+phase,len=reach*(.72+.28*Math.sin(b*9+c.seed)),end=point(a,len);
+   line([[cx,cy],end],c.ink,4);line([[cx,cy],end],c.spark,1.5);
+   for(const t of[.38,.61,.8]){const base=point(a,len*t),side=len*.2*(1-t*.35);for(const sign of[-1,1]){const tip=[base[0]+Math.cos(a+sign*.82)*side,base[1]+Math.sin(a+sign*.82)*side*c.flatten];line([[base[0],base[1]],tip],c.light,2.3);line([[tip[0],tip[1]],[tip[0]+Math.cos(a+sign*.82)*side*.2,tip[1]+Math.sin(a+sign*.82)*side*.2]],c.spark,1.2)}}
+  }
+  g.beginPath();g.arc(cx,cy,R*.14*grow,0,TAU);g.fillStyle=c.light;g.fill();
+ }else if(c.kind==='vine'){
+  const reach=R*grow*c.reach;
+  for(let b=0;b<c.branches;b++){const a=b/c.branches*TAU+phase,ps=[];
+   for(let j=0;j<=70;j++){const t=j/70,d=reach*t,turn=a+c.twist*t*2+Math.sin(t*9+c.seed+b)*.12;ps.push([cx+Math.cos(turn)*d,cy+Math.sin(turn)*d*c.flatten])}
+   line(ps,c.ink,5);line(ps,c.light,2.3);
+   for(let j=2;j<7;j+=2){const t=j/8,base=ps[Math.floor(t*70)],side=(j%3?1:-1),leafA=a+c.twist*t*2+side*.9,size=R*.12*(1-t*.45),tip=point(leafA,size,1);g.beginPath();g.ellipse(base[0]+tip[0]-cx,base[1]+tip[1]-cy,size,size*.42,leafA,0,TAU);g.fillStyle=c.light;g.fill();g.strokeStyle=c.ink;g.lineWidth=1.5;g.stroke()}
+  }
+ }else if(c.kind==='rift'){
+  const rx=R*(.35+grow*.62),ry=rx*c.flatten;
+  g.beginPath();g.ellipse(cx,cy,rx,ry,phase*.15,0,TAU);g.fillStyle='rgba(8,4,22,.76)';g.fill();
+  for(let j=0;j<4;j++){g.beginPath();g.ellipse(cx,cy,rx*(.52+j*.18),ry*(.52+j*.18),phase*(j%2?-1:1)+j*.4,0,TAU);g.strokeStyle=j%2?c.light:c.ink;g.lineWidth=j===0?4:1.8;g.setLineDash(j%2?[5,8]:[]);g.lineDashOffset=-q*32*(j%2?-1:1);g.stroke()}
+  g.setLineDash([]);
+  for(let i=0;i<12;i++){const a=i/12*TAU+phase*2,d=rx*(.65+.16*Math.sin(i*7+c.seed)),p1=point(a,d),p2=point(a+.15,d+8);line([p1,p2],c.spark,2.2)}
+  for(let i=0;i<9;i++){const a=i/9*TAU-phase*2,d=rx*(.8-i*.065),p=point(a,d);g.beginPath();g.arc(p[0],p[1],2+i%3,0,TAU);g.fillStyle=c.spark;g.fill()}
+ }else if(c.kind==='meteor'){
+  for(let i=0;i<4;i++){const a=phase+i/4*TAU,offset=R*(.8+.4*((i*5%7)/7)),x=cx+Math.cos(a)*offset,y=cy+Math.sin(a)*offset*c.flatten,fall=Math.min(1,Math.max(0,(q-i*.12)/.9)),tx=cx+(x-cx)*(1-fall),ty=cy+(y-cy)*(1-fall);
+   const tail=[[tx-Math.cos(a)*R*.35,ty-Math.sin(a)*R*.35],[tx,ty]];line(tail,c.ink,8);line(tail,c.spark,3);g.beginPath();g.arc(tx,ty,5+fall*8,0,TAU);g.fillStyle=c.light;g.fill();
+  }
+  for(let i=0;i<18;i++){const a=i/18*TAU+c.seed,d=R*(.2+grow*.95)*(1+.09*Math.sin(i*8+c.seed));line([[cx,cy],point(a,d)],i%2?c.light:c.ink,i%3?1.8:3.5)}
+  g.beginPath();g.ellipse(cx,cy,R*.31*grow,R*.12*grow,0,0,TAU);g.fillStyle=c.ink;g.fill();g.strokeStyle=c.spark;g.lineWidth=2;g.stroke();
+ }else if(c.kind==='tide'){
+  const span=R*(.8+grow*.85),height=R*.45*grow;
+  for(let band=0;band<4;band++){const ps=[];for(let i=0;i<=70;i++){const t=i/70,x=cx-span+2*span*t,y=cy+(band-1.5)*height*.34+Math.sin(t*c.turns*TAU+q*4+c.seed+band*.9)*height*.48;ps.push([x,y])}line(ps,band%2?c.light:c.ink,band===0?4:2.4)}
+  for(let i=0;i<c.petals;i++){const x=cx-span+(i+.5)/c.petals*span*2,y=cy+Math.sin((i+.5)/c.petals*c.turns*TAU+q*4+c.seed)*height*.48;g.beginPath();g.arc(x,y,2.5+2*Math.sin(q*8+i),0,TAU);g.fillStyle=c.spark;g.fill()}
+ }else if(c.kind==='familiar'){
+  const orbit=R*(.42+.28*grow),a=phase+q*c.spin,x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*c.flatten,size=R*.2;
+  g.beginPath();g.ellipse(x-size*.65,y,size*.7,size*.34,Math.sin(q*13)*.5,0,TAU);g.ellipse(x+size*.65,y,size*.7,size*.34,-Math.sin(q*13)*.5,0,TAU);g.fillStyle=c.light;g.fill();g.strokeStyle=c.ink;g.lineWidth=2;g.stroke();
+  g.beginPath();g.arc(x,y,size,0,TAU);g.fillStyle=c.spark;g.fill();g.strokeStyle=c.ink;g.lineWidth=3;g.stroke();
+  g.fillStyle=c.ink;g.beginPath();g.arc(x-size*.3,y-size*.08,2.8,0,TAU);g.arc(x+size*.3,y-size*.08,2.8,0,TAU);g.fill();
+  const tail=[];for(let i=0;i<30;i++){const t=i/29,aa=a+Math.PI+t*1.4;tail.push([x+Math.cos(aa)*size*(.7+t*1.2),y+Math.sin(aa)*size*(.7+t*1.2)])}line(tail,c.light,2.2);
+  for(let i=0;i<7;i++){const sa=c.seed+i/7*TAU+q*.5,p=point(sa,R*(.8+.35*Math.sin(i*3+c.seed)));g.beginPath();g.arc(p[0],p[1],1.5+i%3,0,TAU);g.fillStyle=c.spark;g.fill()}
+ }
+ g.restore();
+},
 flame(s,q){if(q<2.2)for(let n=0,c=Math.ceil(14*(1-q/2.2));n<c;n++){const p=s.pts[Math.random()*s.pts.length|0];emit('flame',p[0],p[1],s.r/70)}},
 ward(s,q){const b=stage.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2,R=Math.hypot(b.width,b.height)*.52,gr=Math.min(1,q/.45),r=R*(1-(1-gr)**3),fd=q>2?Math.max(0,1-(q-2)/.9):1;if(fd<=0)return;
  g.save();g.globalAlpha=fd;const rim=wc(cx,cy,r,s.sd);g.beginPath();tr(rim);g.fillStyle='rgba(31,122,109,.15)';g.fill();

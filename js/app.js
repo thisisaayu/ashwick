@@ -21,10 +21,10 @@ const dens=(p,st=.05)=>{const o=[p[0]];for(let i=1;i<p.length;i++){const[x0,y0]=
 const wob=p=>{const s=rand(0,9),a=.022;return p.map(([x,y],i)=>[x+a*(Math.sin(i*.21+s)+.5*Math.sin(i*.6+s*2)),y+a*(Math.cos(i*.19+s)+.5*Math.cos(i*.55+s*3))])};
 const P=window.ASHWICK_PRESETS;
 
-const sound=window.ASHWICK_SOUND,sigils=[],parts=[];let drawing;
-function spawn(strokes,k,trace){const pts=strokes.flat();let sx=0,sy=0;pts.forEach(p=>{sx+=p[0];sy+=p[1]});const cx=sx/pts.length,cy=sy/pts.length;let r=40;pts.forEach(p=>r=Math.max(r,Math.hypot(p[0]-cx,p[1]-cy)));
+const sound=window.ASHWICK_SOUND,sigils=[],parts=[];let drawing,hintTimer;
+function spawn(strokes,k,trace){const pts=strokes.flat();let sx=0,sy=0;pts.forEach(p=>{sx+=p[0];sy+=p[1]});const cx=sx/pts.length,cy=sy/pts.length;let r=40;pts.forEach(p=>r=Math.max(r,Math.hypot(p[0]-cx,p[1]-cy)));const custom=trace===0?FX.createCustom(strokes):null;
  const t=performance.now(),st2=strokes.map(p=>p.map(([x,y],i)=>[x+1.8*Math.sin(i*.23+3),y+1.8*Math.cos(i*.2)]));
- sigils.push({st:strokes,st2,pts,k,cx,cy,r,col:K[k][0],t0:t,tr:trace,arm:t+trace,bolt:t+trace+340,ign:t+trace+600,end:t+trace+3600,a:0,i:0,sd:rand(0,9),stars:Array.from({length:40},()=>[rand(0,TAU),Math.sqrt(Math.random()),rand(0,6.28)])})}
+ sigils.push({st:strokes,st2,pts,k,cx,cy,r,col:custom?custom.ink:K[k][0],lanternColor:custom?custom.light:null,custom,t0:t,tr:trace,arm:t+trace,bolt:t+trace+340,ign:t+trace+600,end:t+trace+3600,a:0,i:0,sd:rand(0,9),stars:Array.from({length:40},()=>[rand(0,TAU),Math.sqrt(Math.random()),rand(0,6.28)])})}
 function place(name){const k={Ward:'ward',Flame:'flame',Moon:'moon',Eye:'eye',Earth:'earth',Wind:'wind',Void:'void'}[name]||KS[Math.random()*KS.length|0];
  const r=Math.min(W,H)*rand(.1,.17)*(W<600?1.15:1);let x,y,t=0;
  do{x=rand(r+12,W-r-12);y=rand(r+90,H-r-120)}while(Math.hypot(x-W/2,(y-H/2)*.6)<r+80&&++t<40);
@@ -58,15 +58,15 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;g.clearRect(
  if(drawing.draft){g.globalAlpha=1;g.strokeStyle='#17120f';g.lineWidth=3;drawing.draft.forEach(s=>path(s,s.length))}
  for(let k=sigils.length-1;k>=0;k--){const s=sigils[k];
   if(!s.a&&now>=s.arm){s.a=1;mageController.cast(s,W)}
-  if(!s.i&&now>=s.ign){s.i=1;sound.boltLand();sound.spell(s.k)}
+  if(!s.i&&now>=s.ign){s.i=1;sound.boltLand();sound.spell(s.k);if(s.custom){const hint=$('#hint');hint.textContent=`${s.custom.name} — ${s.custom.action}`;hint.classList.remove('off');clearTimeout(hintTimer);hintTimer=setTimeout(()=>hint.classList.add('off'),3200)}}
   if(now>s.end){sigils.splice(k,1);continue}
   const f=s.tr?Math.min(1,(now-s.t0)/s.tr):1,q=(now-s.ign)/1000,al=s.i?(q<.8?1:Math.max(0,1-(q-.8)/1.2)):.9,n=p=>Math.ceil(p.length*f);
   g.globalAlpha=al;g.lineWidth=3;g.save();g.translate(2.5,2);g.strokeStyle=s.col=='#17120f'?'#c92f17':'#17120f';s.st.forEach(p=>path(p,n(p)));g.restore();
   g.strokeStyle=s.col;s.st.forEach(p=>path(p,n(p)));g.lineWidth=1.1;g.strokeStyle='#17120f';s.st2.forEach(p=>path(p,n(p)));
   g.globalAlpha=1;
   if(now>=s.bolt&&!s.i){if(!s.bs){s.bs=1;sound.boltStart()}const r=orb.getBoundingClientRect(),bx=r.left+r.width/2,by=r.top+r.height/2,t=Math.min(1,(now-s.bolt)/260),x=bx+(s.cx-bx)*t,y=by+(s.cy-by)*t;
-   g.fillStyle=K[s.k][1];g.strokeStyle='#17120f';g.lineWidth=2.5;g.beginPath();g.arc(x,y,7,0,TAU);g.fill();g.stroke();for(let m=0;m<4;m++)emit(s.k,x,y,.7)}
-  if(s.i){FX[s.k](s,q);g.globalAlpha=1;g.setLineDash([])}
+   g.fillStyle=s.lanternColor||K[s.k][1];g.strokeStyle='#17120f';g.lineWidth=2.5;g.beginPath();g.arc(x,y,7,0,TAU);g.fill();g.stroke();for(let m=0;m<4;m++)emit(s.k,x,y,.7)}
+  if(s.i){(s.custom?FX.custom:FX[s.k])(s,q);g.globalAlpha=1;g.setLineDash([])}
  }
  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.l+=dt;const u=p.l/p.m;if(u>=1){parts.splice(i,1);continue}
   if(p.o){p.a+=p.sp*dt;p.rad+=p.vr*dt;p.x=p.o[0]+Math.cos(p.a)*p.rad;p.y=p.o[1]+Math.sin(p.a)*p.rad*(p.sq||1)}else{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}
