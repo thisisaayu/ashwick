@@ -222,7 +222,10 @@
   position: fixed;
   left: 50%;
   top: 50%;
-  width: min(300px, 60vw, 52svh);
+  width: 300px;
+  max-width: 60vw;
+  max-width: min(300px, 60vw, 52vh);
+  max-width: min(300px, 60vw, 52svh);
   transform: translate(-50%, -50%);
   z-index: 1;
 }
@@ -234,6 +237,13 @@
 #orb { fill: var(--c); transform-box: fill-box; transform-origin: 50% 100%; transition: transform .25s; animation: fl .35s ease-in-out infinite alternate; }
 .cast #orb { transform: scale(2.6); }
 @keyframes fl { to { transform: scale(1.12, .9) skewX(4deg); } }
-@media (max-width: 520px) { #stage { top: 47%; width: min(250px, 62vw, 48svh); } }
-@media (max-height: 560px) and (orientation: landscape) { #stage { top: 48%; width: min(190px, 34vh); } }
+@media (max-width: 520px) {
+  #stage { top: 47%; width: 250px; max-width: 62vw; max-width: min(250px, 62vw, 48vh); max-width: min(250px, 62vw, 48svh); }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  #stage { top: 48%; width: 190px; max-width: 34vh; }
+}
+@media (max-height: 520px) and (orientation: portrait) {
+  #stage { top: 42%; width: 155px; max-width: 45vw; max-width: min(155px, 45vw, 34vh); }
+}
 @media (prefers-reduced-motion: reduce) { #mage svg, #orb { animation: none; } }

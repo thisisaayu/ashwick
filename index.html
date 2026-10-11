@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ashwick's Sanctum</title>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/mage.css">
 <link rel="stylesheet" href="css/spells.css">
@@ -64,7 +64,8 @@
 <canvas id="fx"></canvas>
 <div id="dock">
   <div id="hint">Drag to draw your own, or choose one below.</div>
-  <div id="row">
+  <button id="preset-toggle" type="button" aria-expanded="false" aria-controls="row">Choose a sigil</button>
+  <div id="row" hidden>
     <button data-s="Ward">Ward</button><button data-s="Flame">Flame</button><button data-s="Moon">Moon</button><button data-s="Eye">Eye</button><button data-s="Earth">Earth</button><button data-s="Wind">Wind</button><button data-s="Void">Void</button><button data-s="Random">Random sigil</button>
   </div>
 </div>

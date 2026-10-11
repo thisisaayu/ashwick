@@ -1,7 +1,8 @@
 // Small procedural sound palette for Ashwick. Audio starts only after a gesture.
 (() => {
   const key = 'ashwick-sound-muted';
-  let muted = localStorage.getItem(key) === 'true';
+  let muted = false;
+  try { muted = localStorage.getItem(key) === 'true'; } catch (_) {}
   let ctx, master, traceSource, traceGain, traceFilter, traceTick, traceTimer;
   const $ = s => document.querySelector(s);
   const toggle = $('#sound-toggle');
@@ -145,7 +146,9 @@
     }
   }
   toggle.addEventListener('click', () => {
-    muted = !muted; localStorage.setItem(key, String(muted)); setButton();
+    muted = !muted;
+    try { localStorage.setItem(key, String(muted)); } catch (_) {}
+    setButton();
     if (init()) master.gain.setTargetAtTime(muted ? 0 : .22, ctx.currentTime, .04);
   });
   window.ASHWICK_SOUND = { startTrace, updateTrace, stopTrace, presetTrace, casting, boltStart, boltLand, spell };

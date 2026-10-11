@@ -27,7 +27,7 @@ Visit [http://localhost:8000](http://localhost:8000). You can also open `index.h
 ## How to cast
 
 - **Draw your own:** drag across the parchment with a mouse, finger, or stylus. Pause briefly when you finish; Ashwick will cast the sigil.
-- **Choose a sigil:** use the spell buttons along the bottom. Ashwick traces the design, raises his lantern, and sends a bolt toward it.
+- **Choose a sigil:** tap **Choose a sigil** to reveal the spell buttons. Selecting a spell or starting a drawing closes the list. Ashwick traces the design, raises his lantern, and sends a bolt toward it.
 - **Follow the magic:** the spell’s effect blooms around the sigil, then fades away.
 - **Set the sound:** use the button in the upper-right corner to mute or restore audio. Sound starts at a low level, and your mute choice is remembered in this browser.
 
@@ -80,6 +80,8 @@ The page uses plain HTML, CSS, and JavaScript. Preset designs live in `spells/pr
 ## A note from the mage
 
 The interface is designed for a full window, including phones and short landscape screens. Drawing works with pointer input, so mouse, touch, and pen all share the same path. The parchment, imperfect ink, slow rune ring, and handmade spell marks are all part of the charm—best enjoyed at your own pace.
+
+The layout accounts for notches, changing mobile browser bars, and narrow or wide screens. Browsers with Pointer Events use them directly; older touch browsers fall back to touch and mouse input. If a browser blocks the hosted fonts or audio features, the page keeps its local cursive font fallbacks and remains usable without sound.
 
 <div align="center">
 

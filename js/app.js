@@ -2,9 +2,10 @@
 const $=s=>document.querySelector(s),TAU=Math.PI*2,rand=(a,b)=>a+Math.random()*(b-a);
 const cv=$('#fx'),g=cv.getContext('2d'),mage=$('#mage'),orb=$('#orb'),stage=$('#stage');
 let W,H,D,mx=innerWidth/2,my=innerHeight/2;
-function size(){D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;g.setTransform(D,0,0,D,0,0)}
-addEventListener('resize',size);size();
+function size(){const v=window.visualViewport;D=Math.min(devicePixelRatio||1,2);W=Math.max(1,v? v.width:innerWidth);H=Math.max(1,v? v.height:innerHeight);cv.width=Math.round(W*D);cv.height=Math.round(H*D);g.setTransform(D,0,0,D,0,0)}
+addEventListener('resize',size);addEventListener('orientationchange',size);if(window.visualViewport&&window.visualViewport.addEventListener)window.visualViewport.addEventListener('resize',size);size();
 addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
+if(!('PointerEvent' in window)){addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});addEventListener('touchmove',e=>{if(e.touches.length){mx=e.touches[0].clientX;my=e.touches[0].clientY}},{passive:true})}
 /* wobbly circle, closed polyline */
 const wc=(cx,cy,r,sd,n=40)=>Array.from({length:n+1},(_,i)=>{const a=i/n*TAU,w=1+.035*Math.sin(a*3+sd)+.02*Math.sin(a*7+sd*2);return[cx+Math.cos(a)*r*w,cy+Math.sin(a)*r*w]});
 const tr=p=>{g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1])};
@@ -28,9 +29,13 @@ function place(name){const k={Ward:'ward',Flame:'flame',Moon:'moon',Eye:'eye',Ea
  const r=Math.min(W,H)*rand(.1,.17)*(W<600?1.15:1);let x,y,t=0;
  do{x=rand(r+12,W-r-12);y=rand(r+90,H-r-120)}while(Math.hypot(x-W/2,(y-H/2)*.6)<r+80&&++t<40);
  sound.presetTrace(1100);spawn(P[name]().map(s=>wob(dens(s)).map(([u,v])=>[x+u*r,y+v*r])),k,1100);$('#hint').classList.add('off')}
-document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>place(b.dataset.s));
+const presetToggle=$('#preset-toggle'),presetRow=$('#row');
+function closePresetMenu(restoreFocus=false){presetToggle.hidden=false;presetRow.hidden=true;presetToggle.setAttribute('aria-expanded','false');if(restoreFocus)presetToggle.focus()}
+presetToggle.addEventListener('click',()=>{presetToggle.hidden=true;presetRow.hidden=false;presetToggle.setAttribute('aria-expanded','true');presetRow.querySelector('button').focus()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&presetToggle.hidden)closePresetMenu(true)});
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{place(b.dataset.s);closePresetMenu(true)});
 
-drawing=window.ASHWICK_CANVAS(cv,sound,group=>spawn(group,KS[Math.random()*KS.length|0],0));
+drawing=window.ASHWICK_CANVAS(cv,sound,group=>spawn(group,KS[Math.random()*KS.length|0],0),closePresetMenu);
 
 const mageController=window.ASHWICK_MAGE(mage,sound,K);
 function emit(k,x,y,sc=1){const o={x,y,l:0,t:'d',sz:rand(1.5,4)*sc,g:0};

@@ -88,4 +88,14 @@
 }
 
 /* Full-screen sigil drawing surface */
-#fx { position: fixed; inset: 0; z-index: 2; touch-action: none; cursor: crosshair; }
+#fx {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 2;
+  touch-action: none;
+  cursor: crosshair;
+}
