@@ -24,20 +24,20 @@ const wob=p=>{const s=rand(0,9),a=.022;return p.map(([x,y],i)=>[x+a*(Math.sin(i*
 const P=window.ASHWICK_PRESETS;
 
 const sound=window.ASHWICK_SOUND,sigils=[],parts=[];let drawing,hintTimer;
-function spawn(strokes,k,trace){const pts=strokes.flat();let sx=0,sy=0;pts.forEach(p=>{sx+=p[0];sy+=p[1]});const cx=sx/pts.length,cy=sy/pts.length;let r=40;pts.forEach(p=>r=Math.max(r,Math.hypot(p[0]-cx,p[1]-cy)));const custom=trace===0?FX.createCustom(strokes):null;
+function spawn(strokes,k,trace,customKind){const pts=strokes.flat();let sx=0,sy=0;pts.forEach(p=>{sx+=p[0];sy+=p[1]});const cx=sx/pts.length,cy=sy/pts.length;let r=40;pts.forEach(p=>r=Math.max(r,Math.hypot(p[0]-cx,p[1]-cy)));const custom=customKind?FX.createCustom(strokes,customKind):null;
  const t=performance.now(),st2=strokes.map(p=>p.map(([x,y],i)=>[x+1.8*Math.sin(i*.23+3),y+1.8*Math.cos(i*.2)]));
  sigils.push({st:strokes,st2,pts,k,cx,cy,r,col:custom?custom.ink:K[k][0],lanternColor:custom?custom.light:null,custom,t0:t,tr:trace,arm:t+trace,bolt:t+trace+340,ign:t+trace+600,end:t+trace+3600,a:0,i:0,sd:rand(0,9),stars:Array.from({length:40},()=>[rand(0,TAU),Math.sqrt(Math.random()),rand(0,6.28)])})}
 function place(name){const k={Ward:'ward',Flame:'flame',Moon:'moon',Eye:'eye',Earth:'earth',Wind:'wind',Void:'void'}[name]||KS[Math.random()*KS.length|0];
  const r=Math.min(W,H)*rand(.1,.17)*(W<600?1.15:1);let x,y,t=0;
  do{x=rand(r+12,W-r-12);y=rand(r+90,H-r-120)}while(Math.hypot(x-W/2,(y-H/2)*.6)<r+80&&++t<40);
- sound.presetTrace(1100);spawn(P[name]().map(s=>wob(dens(s)).map(([u,v])=>[x+u*r,y+v*r])),k,1100);$('#hint').classList.add('off')}
+ sound.presetTrace(1100);spawn(P[name]().map(s=>wob(dens(s)).map(([u,v])=>[x+u*r,y+v*r])),k,1100);FX.rememberSpell('preset',k);$('#hint').classList.add('off')}
 const presetToggle=$('#preset-toggle'),presetRow=$('#row');
 function closePresetMenu(restoreFocus=false){presetToggle.hidden=false;presetRow.hidden=true;presetToggle.setAttribute('aria-expanded','false');if(restoreFocus)presetToggle.focus()}
 presetToggle.addEventListener('click',()=>{presetToggle.hidden=true;presetRow.hidden=false;presetToggle.setAttribute('aria-expanded','true');presetRow.querySelector('button').focus()});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&presetToggle.hidden)closePresetMenu(true)});
 document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{place(b.dataset.s);closePresetMenu(true)});
 
-drawing=window.ASHWICK_CANVAS(cv,sound,group=>spawn(group,KS[Math.random()*KS.length|0],0),closePresetMenu);
+drawing=window.ASHWICK_CANVAS(cv,sound,group=>{const spell=FX.nextFreehandSpell(KS),k=spell.type==='preset'?spell.key:KS[Math.random()*KS.length|0];spawn(group,k,0,spell.type==='custom'?spell.key:null)},closePresetMenu);
 
 const mageController=window.ASHWICK_MAGE(mage,sound,K);
 function emit(k,x,y,sc=1){const o={x,y,l:0,t:'d',sz:rand(1.5,4)*sc,g:0};

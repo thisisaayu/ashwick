@@ -10,24 +10,31 @@ const customKinds=[
  {name:'familiar',action:'A little star familiar awakens and circles',hue:252}
 ];
 const nameWords=['Wandering','Elder','Singing','Wild','Hollow','Dawnlit','Wayward','Whispering','Bright','Thornbound','Farseeing','Stormworn'];
-let kindBag=[],lastKind;
-const nextCustomKind=()=>{
- if(!kindBag.length){
-  kindBag=customKinds.slice();
-  for(let i=kindBag.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[kindBag[i],kindBag[j]]=[kindBag[j],kindBag[i]]}
-  if(kindBag[kindBag.length-1].name===lastKind)[kindBag[0],kindBag[kindBag.length-1]]=[kindBag[kindBag.length-1],kindBag[0]];
- }
- lastKind=kindBag[kindBag.length-1].name;
- return kindBag.pop();
+let spellBag=[],lastFamily;
+const spellFamily=spell=>({flame:'fire',firebolt:'fire',frost:'frost',rift:'void',void:'void'}[spell.key]||spell.key);
+const shuffledSpells=presetKinds=>{
+ const spells=[...presetKinds.map(key=>({type:'preset',key})),...customKinds.map(kind=>({type:'custom',key:kind.name}))];
+ for(let i=spells.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[spells[i],spells[j]]=[spells[j],spells[i]]}
+ return spells;
 };
-const createCustom=strokes=>{
+const nextFreehandSpell=presetKinds=>{
+ if(!spellBag.length)spellBag=shuffledSpells(presetKinds);
+ let index=spellBag.length-1;
+ if(spellFamily(spellBag[index])===lastFamily){index=spellBag.findIndex(spell=>spellFamily(spell)!==lastFamily);if(index<0)index=spellBag.length-1}
+ const [spell]=spellBag.splice(index,1);lastFamily=spellFamily(spell);return spell;
+};
+const rememberSpell=(type,key)=>{
+ const family=spellFamily({type,key});lastFamily=family;
+ spellBag=spellBag.filter(spell=>spellFamily(spell)!==family);
+};
+const createCustom=(strokes,kindName)=>{
  const points=strokes.flat();
  const bounds=points.reduce((b,[x,y])=>({minX:Math.min(b.minX,x),maxX:Math.max(b.maxX,x),minY:Math.min(b.minY,y),maxY:Math.max(b.maxY,y),sumX:b.sumX+x,sumY:b.sumY+y}),{minX:Infinity,maxX:-Infinity,minY:Infinity,maxY:-Infinity,sumX:0,sumY:0});
  const cx=bounds.sumX/points.length,cy=bounds.sumY/points.length,aspect=(bounds.maxY-bounds.minY)/(bounds.maxX-bounds.minX||1),start=points[0];
- const kind=nextCustomKind(),hue=(kind.hue+rand(-32,32)+360)%360;
+ const kind=customKinds.find(item=>item.name===kindName)||customKinds[Math.random()*customKinds.length|0],hue=(kind.hue+rand(-32,32)+360)%360;
  return{kind:kind.name,action:kind.action,name:`${nameWords[Math.random()*nameWords.length|0]} ${kind.name[0].toUpperCase()+kind.name.slice(1)}`,ink:`hsl(${hue} 48% 23%)`,light:`hsl(${hue+18} 72% 57%)`,spark:`hsl(${hue+38} 96% 82%)`,branches:4+((strokes.length+Math.random()*7|0)%7),petals:4+((Math.floor(points.length/10)+Math.random()*7|0)%7),turns:2+(Math.random()*5|0),phase:Math.atan2(start[1]-cy,start[0]-cx)+rand(-1,1),twist:rand(-2.8,2.8),spin:rand(-1.8,1.8),flatten:Math.max(.55,Math.min(1.3,aspect*.55+rand(.25,.75))),seed:rand(0,TAU),reach:rand(1.1,2.2),variant:Math.random()};
 };
-return {createCustom,custom(s,q){
+return {createCustom,nextFreehandSpell,rememberSpell,custom(s,q){
  const c=s.custom;if(!c)return;const grow=1-Math.pow(1-Math.min(1,q/.62),3),fade=q>2.25?Math.max(0,1-(q-2.25)/.78):1;if(fade<=0||grow<=0)return;
  const{cx,cy,r}=s,R=r*(.65+.8*grow),phase=c.phase+q*c.spin;
  const point=(a,d,flat=c.flatten)=>[cx+Math.cos(a)*d,cy+Math.sin(a)*d*flat];
