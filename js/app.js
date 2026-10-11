@@ -58,7 +58,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;g.clearRect(
  if(drawing.draft){g.globalAlpha=1;g.strokeStyle='#17120f';g.lineWidth=3;drawing.draft.forEach(s=>path(s,s.length))}
  for(let k=sigils.length-1;k>=0;k--){const s=sigils[k];
   if(!s.a&&now>=s.arm){s.a=1;mageController.cast(s,W)}
-  if(!s.i&&now>=s.ign){s.i=1;sound.boltLand();sound.spell(s.k);if(s.custom){const hint=$('#hint');hint.textContent=`${s.custom.name} — ${s.custom.action}`;hint.classList.remove('off');clearTimeout(hintTimer);hintTimer=setTimeout(()=>hint.classList.add('off'),3200)}}
+  if(!s.i&&now>=s.ign){s.i=1;sound.boltLand();sound.spell(s.k);if(s.custom){const hint=$('#hint');hint.textContent=`${s.custom.name}: ${s.custom.action}`;hint.classList.remove('off');clearTimeout(hintTimer);hintTimer=setTimeout(()=>hint.classList.add('off'),3200)}}
   if(now>s.end){sigils.splice(k,1);continue}
   const f=s.tr?Math.min(1,(now-s.t0)/s.tr):1,q=(now-s.ign)/1000,al=s.i?(q<.8?1:Math.max(0,1-(q-.8)/1.2)):.9,n=p=>Math.ceil(p.length*f);
   g.globalAlpha=al;g.lineWidth=3;g.save();g.translate(2.5,2);g.strokeStyle=s.col=='#17120f'?'#c92f17':'#17120f';s.st.forEach(p=>path(p,n(p)));g.restore();
