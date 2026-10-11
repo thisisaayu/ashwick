@@ -1,0 +1,85 @@
+/* ==========================================================
+   Spell visual effects — per-school animated backgrounds
+   ========================================================== */
+
+/* Base spell animation canvas */
+.spell-visual canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* School color overlays */
+.spell-visual[data-school="Evocation"] {
+  background: linear-gradient(135deg, #1a0a0a 0%, #3d1010 50%, #1a0a0a 100%);
+}
+.spell-visual[data-school="Illusion"] {
+  background: linear-gradient(135deg, #0d0a1a 0%, #1e1040 50%, #0d0a1a 100%);
+}
+.spell-visual[data-school="Conjuration"] {
+  background: linear-gradient(135deg, #0a1a0d 0%, #0d3020 50%, #0a1a0d 100%);
+}
+.spell-visual[data-school="Abjuration"] {
+  background: linear-gradient(135deg, #1a1a0a 0%, #3d3510 50%, #1a1a0a 100%);
+}
+.spell-visual[data-school="Transmutation"] {
+  background: linear-gradient(135deg, #0a0f1a 0%, #102a40 50%, #0a0f1a 100%);
+}
+.spell-visual[data-school="Divination"] {
+  background: linear-gradient(135deg, #1a0a1a 0%, #3d1040 50%, #1a0a1a 100%);
+}
+.spell-visual[data-school="Necromancy"] {
+  background: linear-gradient(135deg, #0d0d0d 0%, #1a1a2a 50%, #0d0d0d 100%);
+}
+.spell-visual[data-school="Enchantment"] {
+  background: linear-gradient(135deg, #1a0f0a 0%, #3d2510 50%, #1a0f0a 100%);
+}
+
+/* Spell particles overlay */
+.spell-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.spell-particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: spellParticleDrift 3s ease-in-out infinite;
+}
+
+@keyframes spellParticleDrift {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.8; }
+  50%  { transform: translate(var(--dx, 20px), var(--dy, -30px)) scale(1.3); opacity: 0.4; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+}
+
+/* Spell rune glyph in center */
+.spell-glyph {
+  position: relative;
+  z-index: 1;
+  font-size: 3rem;
+  animation: glyphSpin 8s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes glyphSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Ashwick's rotating hand-drawn rune ring */
+#ringw { position: absolute; left: 50%; top: 45%; width: 190%; transform: translate(-50%, -50%); }
+#ringw svg {
+  display: block;
+  width: 100%;
+  animation: spin 140s linear infinite;
+  stroke: var(--ink);
+  fill: none;
+  stroke-width: .9;
+  opacity: .4;
+  stroke-linecap: round;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #ringw svg { animation: none; } }

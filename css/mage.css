@@ -1,0 +1,239 @@
+/* ==========================================================
+   Mage Character — CSS-only animated wizard
+   ========================================================== */
+
+.mage-container {
+  position: relative;
+  z-index: 2;
+  width: 160px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mage {
+  position: relative;
+  width: 100px;
+  height: 180px;
+  animation: mageFloat 3s ease-in-out infinite;
+}
+
+@keyframes mageFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Hat */
+.mage-hat {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.hat-cone {
+  width: 0;
+  height: 0;
+  border-left: 28px solid transparent;
+  border-right: 28px solid transparent;
+  border-bottom: 50px solid var(--accent);
+  position: relative;
+  transform: rotate(-8deg);
+  transform-origin: bottom center;
+}
+
+.hat-brim {
+  width: 70px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+}
+
+.hat-star {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--highlight);
+  font-size: 14px;
+  animation: starPulse 2s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.3); }
+}
+
+/* Head */
+.mage-head {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 36px;
+  background: var(--bg-surface);
+  border-radius: 50%;
+  z-index: 2;
+  border: 2px solid var(--accent);
+}
+
+.mage-eye {
+  width: 5px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: absolute;
+  top: 14px;
+  animation: blink 4s ease-in-out infinite;
+}
+.mage-eye.left { left: 10px; }
+.mage-eye.right { right: 10px; }
+
+@keyframes blink {
+  0%, 95%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+
+/* Body / robe */
+.mage-body {
+  position: absolute;
+  top: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.mage-robe {
+  width: 54px;
+  height: 70px;
+  background: var(--accent);
+  border-radius: 8px 8px 20px 20px;
+  position: relative;
+}
+.mage-robe::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 0 0 50% 50%;
+  opacity: 0.8;
+}
+
+/* Arms */
+.mage-arm {
+  position: absolute;
+  width: 14px;
+  height: 40px;
+  background: var(--accent);
+  border-radius: 7px;
+  top: 10px;
+  z-index: 2;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.left-arm {
+  left: -14px;
+  transform: rotate(15deg);
+  transform-origin: top center;
+}
+.right-arm {
+  right: -14px;
+  transform: rotate(-15deg);
+  transform-origin: top center;
+}
+
+/* Casting animation */
+.mage.casting .left-arm {
+  transform: rotate(-50deg) translateY(-10px);
+}
+.mage.casting .right-arm {
+  transform: rotate(50deg) translateY(-10px);
+}
+.mage.casting .staff-orb {
+  background: var(--highlight);
+  box-shadow: 0 0 20px var(--highlight), 0 0 60px var(--highlight);
+  transform: scale(1.5);
+}
+
+/* Staff */
+.mage-staff {
+  position: absolute;
+  right: -24px;
+  top: 20px;
+  width: 6px;
+  height: 90px;
+  background: linear-gradient(to bottom, var(--highlight), #8b6914);
+  border-radius: 3px;
+  transform: rotate(-12deg);
+  transform-origin: top center;
+  z-index: 0;
+}
+
+.staff-orb {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: var(--accent-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: all 0.5s ease;
+}
+
+/* Shadow */
+.mage-shadow {
+  width: 60px;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  margin-top: 6px;
+  animation: shadowPulse 3s ease-in-out infinite;
+}
+
+@keyframes shadowPulse {
+  0%, 100% { transform: scaleX(1); opacity: 0.6; }
+  50% { transform: scaleX(0.8); opacity: 0.4; }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .mage-container {
+    width: 120px;
+    height: 170px;
+    transform: scale(0.8);
+  }
+}
+
+/* Ashwick's illustrated character and responsive stage */
+#stage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(300px, 60vw, 52svh);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+#mage { position: relative; transform: scaleX(var(--f, 1)); transition: transform .25s; }
+#mage svg { display: block; width: 100%; height: auto; overflow: visible; animation: bob 5s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-7px) rotate(.6deg); } }
+#arm { transform-origin: 136px 134px; transition: transform .25s cubic-bezier(.3, 1.6, .5, 1); }
+.cast #arm { transform: rotate(-24deg) translateY(-10px); }
+#orb { fill: var(--c); transform-box: fill-box; transform-origin: 50% 100%; transition: transform .25s; animation: fl .35s ease-in-out infinite alternate; }
+.cast #orb { transform: scale(2.6); }
+@keyframes fl { to { transform: scale(1.12, .9) skewX(4deg); } }
+@media (max-width: 520px) { #stage { top: 47%; width: min(250px, 62vw, 48svh); } }
+@media (max-height: 560px) and (orientation: landscape) { #stage { top: 48%; width: min(190px, 34vh); } }
+@media (prefers-reduced-motion: reduce) { #mage svg, #orb { animation: none; } }

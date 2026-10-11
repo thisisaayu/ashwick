@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ashwick's Sanctum</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/mage.css">
+<link rel="stylesheet" href="css/spells.css">
+<link rel="stylesheet" href="css/canvas.css">
+</head>
+<body>
+<header>
+  <h1>Ashwick the Unhurried</h1> <!-- EDIT: name -->
+  <p>Draw anything. He will know what to do with it.</p> <!-- EDIT: tagline -->
+</header>
+<button id="sound-toggle" type="button" aria-pressed="false">Sound on</button>
+<div id="stage">
+  <div id="ringw"><svg viewBox="-110 -110 220 220"><g id="runes"></g></svg></div>
+  <div id="mage">
+    <svg viewBox="0 0 220 340" role="img" aria-label="A masked, patched-up mage with a lantern staff">
+      <defs>
+        <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="6"/></filter>
+        <pattern id="h" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><rect width="1.4" height="4" fill="#e9dcc0" opacity=".26"/></pattern>
+      </defs>
+      <g filter="url(#rough)">
+      <path d="M110 112C74 122 52 210 30 320Q110 338 190 320C168 210 146 122 110 112Z" fill="#c92f17" transform="translate(6 4)"/>
+      <path d="M110 112C74 122 52 210 30 320Q110 338 190 320C168 210 146 122 110 112Z" fill="#17120f"/>
+      <path d="M110 112C74 122 52 210 30 320Q110 338 190 320C168 210 146 122 110 112Z" fill="url(#h)"/>
+      <path d="M70 190q-4 50-18 110M96 210q-2 40-6 100M150 190q6 50 20 110M128 220q3 40 8 96" stroke="#e9dcc0" stroke-width="1.6" fill="none" opacity=".4" stroke-linecap="round"/>
+      <path d="M50 300l7 13M58 298l7 14M66 296l7 15M146 298l6 14M154 300l6 13M162 302l6 12M172 304l5 11" stroke="#e9dcc0" stroke-width="1.4" opacity=".55" stroke-linecap="round"/>
+      <path d="M102 124H118L130 324H90Z" fill="#c92f17"/>
+      <path d="M110 134V318" stroke="#e9dcc0" stroke-width="1.5" stroke-dasharray="3 5"/>
+      <g transform="rotate(-7 66 250)"><rect x="52" y="236" width="26" height="26" fill="#1f7a6d"/><rect x="52" y="236" width="26" height="26" fill="none" stroke="#e9dcc0" stroke-width="1.4" stroke-dasharray="3 3"/><circle cx="64" cy="249" r="6" fill="#e9dcc0"/><circle cx="66.5" cy="247" r="5" fill="#1f7a6d"/></g>
+      <g transform="rotate(6 150 270)"><rect x="140" y="258" width="22" height="22" fill="#c92f17" stroke="#e9dcc0" stroke-width="1.4" stroke-dasharray="3 3"/><path d="M143 269q8-8 16 0q-8 8-16 0z" fill="#e9dcc0"/><circle cx="151" cy="269" r="2.6" fill="#17120f"/></g>
+      <path d="M78 130Q50 190 66 240L90 236Q86 190 98 146Z" fill="#17120f"/>
+      <ellipse cx="110" cy="104" rx="27" ry="30" fill="#17120f"/>
+      <path d="M92 134q18 16 36 0" stroke="#e9dcc0" stroke-width="3.4" stroke-dasharray="1 6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="110" cy="104" rx="16" ry="19" fill="#e9dcc0" stroke="#17120f" stroke-width="2.2"/>
+      <path d="M103 110L110 156L117 110Z" fill="#e9dcc0" stroke="#17120f" stroke-width="2.2"/>
+      <path d="M113 90l-5 9l6 6M110 120v22" stroke="#17120f" stroke-width="1.2" fill="none"/>
+      <circle cx="101" cy="111" r="2.6" fill="#c92f17"/><circle cx="119" cy="111" r="2.6" fill="#c92f17"/>
+      <path d="M97 100q6-6 12 0q-6 5-12 0zM111 100q6-6 12 0q-6 5-12 0z" fill="#17120f"/>
+      <ellipse cx="116" cy="88" rx="62" ry="10" fill="#c92f17" transform="translate(5 4)"/>
+      <ellipse cx="110" cy="86" rx="62" ry="10" fill="#17120f"/>
+      <path d="M72 86C94 80 98 50 100 30C101 14 126 6 150 22C134 24 132 36 134 52C136 70 148 80 150 86Z" fill="#17120f"/>
+      <path d="M74 82Q112 92 148 82" stroke="#c92f17" stroke-width="5" fill="none"/>
+      <path d="M104 52l9 9m0-9l-9 9" stroke="#e9dcc0" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="121" cy="68" r="6" fill="#e9dcc0"/><circle cx="123.5" cy="66" r="5" fill="#17120f"/>
+      <g id="arm">
+        <path d="M136 134Q160 158 168 188" stroke="#17120f" stroke-width="20" stroke-linecap="round" fill="none"/>
+        <circle cx="170" cy="190" r="6.5" fill="#e9dcc0" stroke="#17120f" stroke-width="1.8"/>
+        <path d="M170 330C172 250 168 150 170 72" stroke="#17120f" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <path d="M159 44h22l-3 28h-16z" fill="#17120f"/>
+        <path d="M162 47h16l-2.5 22h-11z" fill="#f2a516" opacity=".45"/>
+        <path id="orb" d="M170 48c6 7 8 12 0 21c-8-9-6-14 0-21z"/>
+        <path d="M159 44h22" stroke="#c92f17" stroke-width="3"/>
+      </g>
+      </g>
+    </svg>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+<div id="dock">
+  <div id="hint">Drag to draw your own, or choose one below.</div>
+  <div id="row">
+    <button data-s="Ward">Ward</button><button data-s="Flame">Flame</button><button data-s="Moon">Moon</button><button data-s="Eye">Eye</button><button data-s="Earth">Earth</button><button data-s="Wind">Wind</button><button data-s="Void">Void</button><button data-s="Random">Random sigil</button>
+  </div>
+</div>
+<script src="spells/presets.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/spells.js"></script>
+<script src="js/mage.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
