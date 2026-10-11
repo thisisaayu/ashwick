@@ -238,7 +238,7 @@
 .cast #orb { transform: scale(2.6); }
 @keyframes fl { to { transform: scale(1.12, .9) skewX(4deg); } }
 @media (max-width: 520px) {
-  #stage { top: 47%; width: 250px; max-width: 62vw; max-width: min(250px, 62vw, 48vh); max-width: min(250px, 62vw, 48svh); }
+  #stage { top: 47%; width: 190px; max-width: min(190px, 48vw, 38vh); max-width: min(190px, 48vw, 38svh); }
 }
 @media (max-height: 560px) and (orientation: landscape) {
   #stage { top: 48%; width: 190px; max-width: 34vh; }

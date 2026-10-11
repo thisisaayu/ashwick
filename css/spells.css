@@ -81,5 +81,6 @@
   opacity: .4;
   stroke-linecap: round;
 }
+@media (max-width: 520px) { #ringw { width: 150%; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #ringw svg { animation: none; } }
