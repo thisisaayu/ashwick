@@ -7,7 +7,12 @@ const customKinds=[
  {name:'rift',action:'A doorway opens into a turning void',hue:281},
  {name:'meteor',action:'A shower of falling stars strikes the mark',hue:25},
  {name:'tide',action:'A curling wave sweeps through the sigil',hue:187},
- {name:'familiar',action:'A little star familiar awakens and circles',hue:252}
+ {name:'familiar',action:'A little star familiar awakens and circles',hue:252},
+ {name:'sunburst',action:'A small sun opens and throws out golden rays',hue:43},
+ {name:'mirror',action:'Bright mirror shards turn around the sigil',hue:211},
+ {name:'moths',action:'A swarm of luminous moths rises and circles',hue:326},
+ {name:'gravity',action:'Loose stones lift and spiral into a dark well',hue:229},
+ {name:'echo',action:'A ringing pulse rolls out through the air',hue:174}
 ];
 const nameWords=['Wandering','Elder','Singing','Wild','Hollow','Dawnlit','Wayward','Whispering','Bright','Thornbound','Farseeing','Stormworn'];
 let spellBag=[],lastFamily;
@@ -84,6 +89,44 @@ return {createCustom,nextFreehandSpell,rememberSpell,custom(s,q){
   const span=R*(.8+grow*.85),height=R*.45*grow;
   for(let band=0;band<4;band++){const ps=[];for(let i=0;i<=70;i++){const t=i/70,x=cx-span+2*span*t,y=cy+(band-1.5)*height*.34+Math.sin(t*c.turns*TAU+q*4+c.seed+band*.9)*height*.48;ps.push([x,y])}line(ps,band%2?c.light:c.ink,band===0?4:2.4)}
   for(let i=0;i<c.petals;i++){const x=cx-span+(i+.5)/c.petals*span*2,y=cy+Math.sin((i+.5)/c.petals*c.turns*TAU+q*4+c.seed)*height*.48;g.beginPath();g.arc(x,y,2.5+2*Math.sin(q*8+i),0,TAU);g.fillStyle=c.spark;g.fill()}
+ }else if(c.kind==='sunburst'){
+  const rays=c.branches*2,reach=R*(.72+.28*grow);
+  for(let i=0;i<rays;i++){const a=i/rays*TAU+phase,inner=R*(.28+.04*Math.sin(i*5+c.seed)),outer=reach*(.72+.28*Math.sin(i*8+c.seed));line([point(a,inner),point(a,outer)],i%2?c.light:c.spark,i%3?2.2:4)}
+  g.beginPath();g.arc(cx,cy,R*.34,0,TAU);g.fillStyle=c.ink;g.fill();g.strokeStyle=c.spark;g.lineWidth=3;g.stroke();
+  g.beginPath();g.arc(cx,cy,R*.25,0,TAU);g.fillStyle=c.light;g.fill();
+  for(let i=0;i<c.petals;i++){const a=i/c.petals*TAU+phase,d=R*.18;g.beginPath();g.arc(cx+Math.cos(a)*d,cy+Math.sin(a)*d,d*.14,0,TAU);g.fillStyle=c.spark;g.fill()}
+ }else if(c.kind==='mirror'){
+  const shards=c.petals+2;
+  for(let i=0;i<shards;i++){const a=i/shards*TAU+phase+q*.12,inner=R*.16,outer=R*(.72+.24*Math.sin(i*7+c.seed))*grow,left=a-.16,right=a+.16;
+   g.beginPath();g.moveTo(...point(left,inner));g.lineTo(...point(a,outer));g.lineTo(...point(right,inner));g.lineTo(...point(a,inner*.45));g.closePath();g.fillStyle=i%2?c.light:c.ink;g.fill();g.strokeStyle=c.spark;g.lineWidth=1.8;g.stroke();
+   line([point(left,inner),point(a,outer*.78)],c.spark,1.3)
+  }
+  g.beginPath();g.arc(cx,cy,R*.14,0,TAU);g.fillStyle=c.spark;g.fill();
+ }else if(c.kind==='moths'){
+  const count=c.petals+2;
+  for(let i=0;i<count;i++){const a=i/count*TAU+phase+q*(.35+(i%3)*.1),orbit=R*(.35+.42*((i*5%9)/9))*grow,x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*c.flatten,size=R*(.09+.025*(i%3)),flap=Math.sin(q*15+i+c.seed)*.48;
+   g.save();g.translate(x,y);g.rotate(a+Math.PI/2);
+   g.beginPath();g.ellipse(-size*.62,0,size*.64,size*.34,-flap,0,TAU);g.ellipse(size*.62,0,size*.64,size*.34,flap,0,TAU);g.fillStyle=i%2?c.light:c.spark;g.fill();g.strokeStyle=c.ink;g.lineWidth=1.5;g.stroke();
+   g.beginPath();g.moveTo(0,-size*.38);g.lineTo(0,size*.45);g.strokeStyle=c.ink;g.lineWidth=2;g.stroke();
+   g.beginPath();g.moveTo(-size*.08,-size*.3);g.quadraticCurveTo(-size*.35,-size*.8,-size*.48,-size*.68);g.moveTo(size*.08,-size*.3);g.quadraticCurveTo(size*.35,-size*.8,size*.48,-size*.68);g.stroke();g.restore()
+  }
+ }else if(c.kind==='gravity'){
+  const rocks=c.branches+2;
+  for(let orbit=0;orbit<3;orbit++){g.beginPath();g.ellipse(cx,cy,R*(.38+orbit*.2),R*(.24+orbit*.13)*c.flatten,phase+orbit*.5,0,TAU);g.setLineDash([4,8]);g.lineDashOffset=-q*16*(orbit%2?-1:1);g.strokeStyle=c.light;g.lineWidth=1.3;g.stroke()}
+  g.setLineDash([]);
+  for(let i=0;i<rocks;i++){const a=i/rocks*TAU+phase+q*(1.1+i%3*.25),fall=(q*.27+i/rocks*.5)%1,orbit=R*(1.05-fall*.72),x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*c.flatten,z=R*(.055+.025*(i%3));
+   g.beginPath();for(let j=0;j<7;j++){const aa=j/7*TAU+phase,rad=z*(.76+.24*Math.sin(j*11+i+c.seed));const px=x+Math.cos(aa)*rad,py=y+Math.sin(aa)*rad;if(j)g.lineTo(px,py);else g.moveTo(px,py)}g.closePath();g.fillStyle=i%2?c.ink:c.light;g.fill();g.strokeStyle=c.spark;g.lineWidth=1.7;g.stroke();
+   line([[x-z*.3,y-z*.2],[x+z*.25,y+z*.18]],c.spark,1.2)
+  }
+  g.beginPath();g.arc(cx,cy,R*(.12+.04*Math.sin(q*9)),0,TAU);g.fillStyle=c.ink;g.fill();g.strokeStyle=c.spark;g.lineWidth=2;g.stroke();
+ }else if(c.kind==='echo'){
+  const waves=5;
+  for(let band=0;band<waves;band++){const phaseWave=(q*.42+band/waves)%1,rad=R*(.12+phaseWave*1.25),alpha=fade*(1-phaseWave*.48),ps=[];
+   for(let i=0;i<=96;i++){const a=i/96*TAU,warp=1+.045*Math.sin(a*c.turns+q*5+band)*Math.sin(a*3+c.seed);ps.push(point(a,rad*warp))}
+   g.globalAlpha=alpha;line(ps,band%2?c.light:c.spark,band===0?3.5:1.8)
+  }
+  g.globalAlpha=fade;
+  for(let i=0;i<c.branches;i++){const a=i/c.branches*TAU+phase,d=R*(.35+.52*((i*7%11)/11)),p=point(a,d);g.beginPath();g.arc(p[0],p[1],2.5+1.5*Math.sin(q*8+i),0,TAU);g.fillStyle=c.spark;g.fill()}
  }else if(c.kind==='familiar'){
   const orbit=R*(.42+.28*grow),a=phase+q*c.spin,x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*c.flatten,size=R*.2;
   g.beginPath();g.ellipse(x-size*.65,y,size*.7,size*.34,Math.sin(q*13)*.5,0,TAU);g.ellipse(x+size*.65,y,size*.7,size*.34,-Math.sin(q*13)*.5,0,TAU);g.fillStyle=c.light;g.fill();g.strokeStyle=c.ink;g.lineWidth=2;g.stroke();
